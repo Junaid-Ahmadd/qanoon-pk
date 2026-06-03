@@ -1,26 +1,132 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-urdu: var(--font-urdu), 'Noto Nastaliq Urdu', serif;
+  --color-primary: #1a5c38;
+  --color-primary-dark: #14472c;
+  --color-accent: #d97706;
+  --color-accent-light: #fef3c7;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Urdu text utility */
+.font-urdu {
+  font-family: var(--font-urdu), 'Noto Nastaliq Urdu', serif;
+  line-height: 2.2;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Prose overrides for rendered markdown */
+.prose {
+  max-width: none;
+}
+.prose h2 {
+  color: #1a5c38;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid #e5f0ea;
+}
+.prose h3 {
+  color: #1e293b;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+.prose p {
+  color: #374151;
+  line-height: 1.75;
+  margin-bottom: 1rem;
+}
+.prose ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+.prose ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+.prose li {
+  color: #374151;
+  margin-bottom: 0.3rem;
+  line-height: 1.65;
+}
+.prose strong {
+  color: #111827;
+  font-weight: 600;
+}
+.prose a {
+  color: #1a5c38;
+  text-decoration: underline;
+}
+.prose a:hover {
+  color: #14472c;
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+  font-size: 0.9rem;
+}
+.prose th {
+  background: #f0f7f3;
+  color: #1a5c38;
+  font-weight: 600;
+  text-align: left;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #d1e7da;
+}
+.prose td {
+  padding: 0.5rem 0.8rem;
+  border: 1px solid #e5f0ea;
+  color: #374151;
+}
+.prose tr:nth-child(even) td {
+  background: #f9fdf9;
+}
+.prose hr {
+  border: none;
+  border-top: 2px solid #e5f0ea;
+  margin: 2rem 0;
+}
+.prose blockquote {
+  border-left: 4px solid #1a5c38;
+  padding-left: 1rem;
+  color: #4b5563;
+  font-style: italic;
+  margin: 1rem 0;
+}
+.prose pre {
+  background: #f3f4f6;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+}
+.prose code {
+  background: #f0f7f3;
+  color: #1a5c38;
+  padding: 0.1em 0.3em;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Fillable field highlight in templates */
+.fillable-field {
+  background-color: #fef3c7;
+  color: #92400e;
+  border-radius: 3px;
+  padding: 0 3px;
+  font-weight: 500;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: color, background-color, border-color;
+  transition-timing-function: ease;
+  transition-duration: 150ms;
 }
