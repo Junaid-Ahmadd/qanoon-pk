@@ -38,12 +38,6 @@ export default function RootLayout({ children }) {
               </span>
             </Link>
             <nav className="flex items-center gap-2">
-              <Link
-                href="/studio"
-                className="text-xs sm:text-sm px-3 py-1.5 rounded-lg text-gray-600 hover:text-[#1a5c38] hover:bg-green-50 transition-all font-medium"
-              >
-                Sanity Studio
-              </Link>
             </nav>
           </div>
         </header>
