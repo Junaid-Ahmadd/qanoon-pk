@@ -71,20 +71,13 @@ export async function POST(request) {
     }
 
     const ai = new GoogleGenAI({ apiKey })
-    const base64Data = buffer.toString('base64')
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: [
-        {
-          inlineData: {
-            mimeType: file.type || 'application/pdf',
-            data: base64Data
-          }
-        },
-        `Extract a clean title from this document, automatically determine a high-level category (e.g., Civil Law, Criminal Law, Rental Law, Family Law), and define a hyper-niche subcategory based on the content (e.g., Rental Disputes, Bail Application, Divorce & Khula). Generate a 2-sentence summary.
+        `Based ONLY on the legal document file name: "${file.name}", extract a clean title (e.g. removing file extensions, dates, or numbers), determine a high-level category (e.g., Civil Law, Criminal Law, Rental Law, Family Law), and define a hyper-niche subcategory based on that title (e.g., Rental Disputes, Bail Application, Divorce & Khula).
 Force response ONLY in clean, structured JSON format:
-{ "title": "string", "category": "string", "subcategory": "string", "summary": "string" }`
+{ "title": "string", "category": "string", "subcategory": "string" }`
       ],
       config: {
         responseMimeType: 'application/json'
@@ -97,7 +90,7 @@ Force response ONLY in clean, structured JSON format:
       analysis = JSON.parse(resultText)
     } catch (parseErr) {
       console.error('Failed to parse Gemini output:', resultText)
-      return NextResponse.json({ error: 'Invalid response from AI Gatekeeper' }, { status: 500 })
+      return NextResponse.json({ error: 'Invalid response from AI' }, { status: 500 })
     }
 
     // 5. Update row based on approval (All documents are auto-approved)
@@ -107,7 +100,7 @@ Force response ONLY in clean, structured JSON format:
         title: analysis.title || file.name.replace(/\.[^/.]+$/, ""),
         category: analysis.category || 'Civil Law',
         subcategory: analysis.subcategory || 'General',
-        summary: analysis.summary || 'No summary generated.',
+        summary: 'Document uploaded to directory.',
         status: 'approved'
       })
       .eq('id', docId)
