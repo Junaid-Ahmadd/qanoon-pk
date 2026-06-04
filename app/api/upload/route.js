@@ -82,11 +82,9 @@ export async function POST(request) {
             data: base64Data
           }
         },
-        `Verify if this document is an official Pakistani legal document, Bare Act, case judgment, or legal manual page.
-If NOT legal material, flag it as is_legal: false.
-If IT IS valid legal material, set is_legal: true, extract a clean title, automatically determine a high-level category (e.g., Civil Law, Criminal Law, Rental Law, Family Law), and define a hyper-niche subcategory based on the content (e.g., Rental Disputes, Bail Application, Divorce & Khula). Generate a 2-sentence summary.
+        `Extract a clean title from this document, automatically determine a high-level category (e.g., Civil Law, Criminal Law, Rental Law, Family Law), and define a hyper-niche subcategory based on the content (e.g., Rental Disputes, Bail Application, Divorce & Khula). Generate a 2-sentence summary.
 Force response ONLY in clean, structured JSON format:
-{ "is_legal": boolean, "title": "string", "category": "string", "subcategory": "string", "summary": "string" }`
+{ "title": "string", "category": "string", "subcategory": "string", "summary": "string" }`
       ],
       config: {
         responseMimeType: 'application/json'
@@ -102,30 +100,19 @@ Force response ONLY in clean, structured JSON format:
       return NextResponse.json({ error: 'Invalid response from AI Gatekeeper' }, { status: 500 })
     }
 
-    // 5. Update row based on approval
-    if (analysis.is_legal) {
-      await supabaseAdmin
-        .from('community_documents')
-        .update({
-          title: analysis.title || file.name.replace(/\.[^/.]+$/, ""),
-          category: analysis.category || 'Civil Law',
-          subcategory: analysis.subcategory || 'General',
-          summary: analysis.summary || 'No summary generated.',
-          status: 'approved'
-        })
-        .eq('id', docId)
+    // 5. Update row based on approval (All documents are auto-approved)
+    await supabaseAdmin
+      .from('community_documents')
+      .update({
+        title: analysis.title || file.name.replace(/\.[^/.]+$/, ""),
+        category: analysis.category || 'Civil Law',
+        subcategory: analysis.subcategory || 'General',
+        summary: analysis.summary || 'No summary generated.',
+        status: 'approved'
+      })
+      .eq('id', docId)
 
-      return NextResponse.json({ success: true, status: 'approved', analysis })
-    } else {
-      await supabaseAdmin
-        .from('community_documents')
-        .update({
-          status: 'rejected'
-        })
-        .eq('id', docId)
-
-      return NextResponse.json({ success: false, status: 'rejected', message: 'Document failed legal verification.' })
-    }
+    return NextResponse.json({ success: true, status: 'approved', analysis })
 
   } catch (error) {
     console.error('API Upload error:', error)
