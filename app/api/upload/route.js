@@ -72,25 +72,46 @@ export async function POST(request) {
 
     const ai = new GoogleGenAI({ apiKey })
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: [
-        `Based ONLY on the legal document file name: "${file.name}", extract a clean title (e.g. removing file extensions, dates, or numbers), determine a high-level category (e.g., Civil Law, Criminal Law, Rental Law, Family Law), and define a hyper-niche subcategory based on that title (e.g., Rental Disputes, Bail Application, Divorce & Khula).
-Force response ONLY in clean, structured JSON format:
-{ "title": "string", "category": "string", "subcategory": "string" }`
-      ],
-      config: {
-        responseMimeType: 'application/json'
-      }
-    })
-
-    const resultText = response.text
     let analysis
     try {
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: [
+          `Based ONLY on the legal document file name: "${file.name}", extract a clean title (e.g. removing file extensions, dates, or numbers), determine a high-level category (e.g., Civil Law, Criminal Law, Rental Law, Family Law), and define a hyper-niche subcategory based on that title (e.g., Rental Disputes, Bail Application, Divorce & Khula).
+Force response ONLY in clean, structured JSON format:
+{ "title": "string", "category": "string", "subcategory": "string" }`
+        ],
+        config: {
+          responseMimeType: 'application/json'
+        }
+      })
+
+      const resultText = response.text
       analysis = JSON.parse(resultText)
-    } catch (parseErr) {
-      console.error('Failed to parse Gemini output:', resultText)
-      return NextResponse.json({ error: 'Invalid response from AI' }, { status: 500 })
+    } catch (apiErr) {
+      console.warn('Gemini API quota exceeded or call failed. Using local regex fallback:', apiErr.message || apiErr)
+      
+      const cleanTitle = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, ' ')
+      let category = 'Civil Law'
+      let subcategory = 'General Documents'
+
+      const lowerName = file.name.toLowerCase()
+      if (lowerName.includes('rent') || lowerName.includes('evict') || lowerName.includes('tenant') || lowerName.includes('landlord')) {
+        category = 'Civil Law'
+        subcategory = 'Rental Disputes'
+      } else if (lowerName.includes('divorce') || lowerName.includes('khula') || lowerName.includes('marriage') || lowerName.includes('nikah')) {
+        category = 'Family Law'
+        subcategory = 'Divorce & Khula'
+      } else if (lowerName.includes('bail') || lowerName.includes('fir') || lowerName.includes('police') || lowerName.includes('criminal')) {
+        category = 'Criminal Law'
+        subcategory = 'Bail Applications'
+      }
+
+      analysis = {
+        title: cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1),
+        category,
+        subcategory
+      }
     }
 
     // 5. Update row based on approval (All documents are auto-approved)
