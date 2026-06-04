@@ -24,7 +24,7 @@ export async function POST(request) {
 
     if (storageError) {
       console.error('Storage error:', storageError)
-      return NextResponse.json({ error: 'Failed to upload file to storage' }, { status: 500 })
+      return NextResponse.json({ error: `Failed to upload file to storage: ${storageError.message || JSON.stringify(storageError)}` }, { status: 500 })
     }
 
     // 2. Get public URL of the uploaded asset
@@ -44,7 +44,7 @@ export async function POST(request) {
 
     if (dbError) {
       console.error('Database insert error:', dbError)
-      return NextResponse.json({ error: 'Failed to create document record' }, { status: 500 })
+      return NextResponse.json({ error: `Failed to create document record: ${dbError.message || JSON.stringify(dbError)}` }, { status: 500 })
     }
 
     const docId = docData.id
@@ -109,6 +109,6 @@ Force response ONLY in clean, structured JSON format:
 
   } catch (error) {
     console.error('API Upload error:', error)
-    return NextResponse.json({ error: 'Internal server error processing file' }, { status: 500 })
+    return NextResponse.json({ error: `Internal server error: ${error.message || JSON.stringify(error)}` }, { status: 500 })
   }
 }
