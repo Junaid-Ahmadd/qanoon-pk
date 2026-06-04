@@ -518,10 +518,10 @@ export default function ConsoleClient() {
                 <div className="py-8 text-center flex flex-col items-center justify-center gap-3">
                   <Loader2 className="w-8 h-8 text-[#1a5c38] animate-spin" />
                   <p className="text-xs font-bold text-gray-700">
-                    {uploadStatus === 'uploading' ? 'Uploading file to Supabase...' : 'AI Moderator checking legal contents...'}
+                    {uploadStatus === 'uploading' ? 'Uploading file to Supabase...' : 'AI extracting document contents...'}
                   </p>
                   <p className="text-[10px] text-gray-400 max-w-[250px] leading-relaxed">
-                    Agent 1 (The Gatekeeper) is extracting subcategories, validating jurisdiction (Punjab), and writing index.
+                    Gemini is extracting the title, category, subcategory, and generating a summary for the directory.
                   </p>
                 </div>
               )}
